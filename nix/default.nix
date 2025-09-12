@@ -14,7 +14,7 @@
   wayland-scanner,
   xcbutilwm,
   xwayland,
-  enableXWayland ? true,
+  enableXWayland ? false,
   meson,
   ninja,
   mmsg,

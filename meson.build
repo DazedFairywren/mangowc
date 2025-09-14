@@ -30,8 +30,6 @@ endif
 
 cc = meson.get_compiler('c')
 libm = cc.find_library('m')
-xcb = dependency('xcb', required : get_option('xwayland'))
-xlibs = dependency('xcb-icccm', required : get_option('xwayland'))
 wayland_server_dep = dependency('wayland-server')
 wlroots_dep = dependency('wlroots-0.19',version: '>=0.19.0')
 xkbcommon_dep = dependency('xkbcommon')
@@ -73,10 +71,6 @@ if get_option('asan')
   ]
 endif
 
-if xcb.found() and xlibs.found()
-  c_args += '-DXWAYLAND'
-endif
-
 # 链接参数（根据 debug 状态添加 ASAN）
 link_args = []
 if get_option('asan')
@@ -90,8 +84,6 @@ executable('mango',
   wayland_sources,
   dependencies : [
     libm,
-    xcb,
-    xlibs,
     libscenefx_dep,
     wayland_server_dep,
     wlroots_dep,

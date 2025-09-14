@@ -1,7 +1,6 @@
 {
   lib,
   fetchFromGitHub,
-  libX11,
   libinput,
   libxcb,
   libxkbcommon,
@@ -12,9 +11,6 @@
   wayland,
   wayland-protocols,
   wayland-scanner,
-  xcbutilwm,
-  xwayland,
-  enableXWayland ? false,
   meson,
   ninja,
   mmsg,
@@ -63,11 +59,6 @@ in
         wlroots-git
         scenefx
         libGL
-      ]
-      ++ lib.optionals enableXWayland [
-        libX11
-        xcbutilwm
-        xwayland
       ];
 
     passthru = {

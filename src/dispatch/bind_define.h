@@ -2,7 +2,7 @@ void bind_to_view(const Arg *arg) {
 
 	unsigned int target = arg->ui;
 
-	if (selmon->pertag->curtag &&
+	if (view_current_to_back && selmon->pertag->curtag &&
 		(target & TAGMASK) == (selmon->tagset[selmon->seltags])) {
 		if (selmon->pertag->prevtag)
 			target = 1 << (selmon->pertag->prevtag - 1);
@@ -11,7 +11,7 @@ void bind_to_view(const Arg *arg) {
 	}
 
 	if ((int)target == INT_MIN && selmon->pertag->curtag == 0) {
-		if (selmon->pertag->prevtag)
+		if (view_current_to_back && selmon->pertag->prevtag)
 			target = 1 << (selmon->pertag->prevtag - 1);
 		else
 			target = 0;
@@ -418,6 +418,7 @@ void restore_minimized(const Arg *arg) {
 void // 17
 setlayout(const Arg *arg) {
 	int jk;
+
 	for (jk = 0; jk < LENGTH(layouts); jk++) {
 		if (strcmp(layouts[jk].name, arg->v) == 0) {
 			selmon->pertag->ltidxs[selmon->pertag->curtag] = &layouts[jk];
@@ -846,6 +847,7 @@ void switch_layout(const Arg *arg) {
 			len = MAX(strlen(layouts[ji].name), strlen(target_layout_name));
 			if (strncmp(layouts[ji].name, target_layout_name, len) == 0) {
 				selmon->pertag->ltidxs[selmon->pertag->curtag] = &layouts[ji];
+
 				break;
 			}
 		}

@@ -140,12 +140,10 @@ void dwl_ipc_output_printstatus_to(DwlIpcOutput *ipc_output) {
 	title = focused ? client_get_title(focused) : "";
 	appid = focused ? client_get_appid(focused) : "";
 
-	if (monitor->pertag->curtag) {
-		symbol = monitor->pertag->ltidxs[monitor->pertag->curtag]->symbol;
-	} else if (monitor->isoverview) {
+	if (monitor->isoverview) {
 		symbol = overviewlayout.symbol;
 	} else {
-		symbol = monitor->pertag->ltidxs[monitor->pertag->prevtag]->symbol;
+		symbol = monitor->pertag->ltidxs[monitor->pertag->curtag]->symbol;
 	}
 
 	keyboard = &kb_group->wlr_group->keyboard;

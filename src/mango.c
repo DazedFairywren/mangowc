@@ -641,9 +641,9 @@ static struct wlr_box setclient_coordinate_center(Client *c,
 												  int offsetx, int offsety);
 static unsigned int get_tags_first_tag(unsigned int tags);
 
-static struct wlr_output_mode *get_output_mode(struct wlr_output *output,
-											   int width, int height,
-											   float refresh);
+static struct wlr_output_mode *
+get_nearest_output_mode(struct wlr_output *output, int width, int height,
+						float refresh);
 
 static void client_commit(Client *c);
 static void layer_commit(LayerSurface *l);
@@ -2504,17 +2504,25 @@ void createlocksurface(struct wl_listener *listener, void *data) {
 		client_notify_enter(lock_surface->surface, wlr_seat_get_keyboard(seat));
 }
 
-struct wlr_output_mode *get_output_mode(struct wlr_output *output, int width,
-										int height, float refresh) {
-	struct wlr_output_mode *mode;
+struct wlr_output_mode *get_nearest_output_mode(struct wlr_output *output,
+												int width, int height,
+												float refresh) {
+	struct wlr_output_mode *mode, *nearest_mode = NULL;
+	float min_diff = 99999.0f;
+
 	wl_list_for_each(mode, &output->modes, link) {
-		if (mode->width == width && mode->height == height &&
-			(int)round(mode->refresh / 1000) == (int)round(refresh)) {
-			return mode;
+		if (mode->width == width && mode->height == height) {
+			float mode_refresh = mode->refresh / 1000.0f;
+			float diff = fabsf(mode_refresh - refresh);
+
+			if (diff < min_diff) {
+				min_diff = diff;
+				nearest_mode = mode;
+			}
 		}
 	}
 
-	return NULL;
+	return nearest_mode;
 }
 
 void createmon(struct wl_listener *listener, void *data) {
@@ -2579,12 +2587,13 @@ void createmon(struct wl_listener *listener, void *data) {
 			rr = r->rr;
 
 			if (r->width > 0 && r->height > 0 && r->refresh > 0) {
-				custom_monitor_mode = true;
-				internal_mode = get_output_mode(m->wlr_output, r->width,
-												r->height, r->refresh);
+				internal_mode = get_nearest_output_mode(m->wlr_output, r->width,
+														r->height, r->refresh);
 				if (internal_mode) {
+					custom_monitor_mode = true;
 					wlr_output_state_set_mode(&state, internal_mode);
-				} else {
+				} else if (wlr_output_is_headless(m->wlr_output)) {
+					custom_monitor_mode = true;
 					wlr_output_state_set_custom_mode(
 						&state, r->width, r->height,
 						(int)roundf(r->refresh * 1000));

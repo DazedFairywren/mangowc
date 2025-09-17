@@ -28,6 +28,7 @@
         rev = "afbb5b7c2b14152730b57aa11119b1b16a299d5b";
         sha256 = "sha256-pVU+CuiqvduMTpsnDHX/+EWY2qxHX2lXKiVzdGtcnYY=";
       };
+      NIX_CFLAGS_COMPILE = "-Dxwayland=disabled";
     }
   );
 in
